@@ -6,16 +6,13 @@ import argparse
 import ROOT as r
 r.gROOT.SetBatch(True)
 from copy import deepcopy
-import CMS_lumi
 import myPlotter2D as effplot2D
 import myPlotter1D as effplot1D
-from allLegends import legends
 from subprocess import call
-from bcolors import bcolors
-from markerColors import markerColors
+from termcolor import colored
 
-parser = argparse.ArgumentParser(description='Run the AM efficiency analysis')
-parser.add_argument('-n','--ntuples', action='store_true', default = False)
+parser = argparse.ArgumentParser(description='Run the AM efficiency analysis and plotting')
+parser.add_argument('-e','--executeEffAN', action='store_false', default = True, dest='ntuples')
 parser.add_argument('-a','--acceptance', action='store_true', default = False)
 parser.add_argument('-nt','--noTimeCut', action='store_false', default = True, dest='timeCut')
 parser.add_argument('-p', '--plot', action='store_true',  dest='plot')
@@ -178,8 +175,7 @@ plotPt = { 'OutputFilename' : 'EffPt',
 			  'sample': sam,
    		    }
 
-plotting1D = { 'Eta': plotEta, 'Phi': plotPhi, 'Pt': plotPt }
-# plotting1D = {'Pt': plotPt }
+
 
 plottingZoomed = deepcopy(plotting)
 plottingZoomed['zmin'] = 0.9
@@ -187,18 +183,21 @@ plottingZoomed['zmax'] = 1.0
 plottingZoomed['OutputFilename'] = 'EffPhiEtaZoomed'
 plotting2D = { 'EffPhiEta' : plotting, 'EffPhiEtaZoomed' : plottingZoomed}
 
-if sam == 'dy':
+if 'dy' in sam:
 	plottingZoomed['energy'] = '14 TeV'
 	plotting['energy'] = '14 TeV'
 	plotEta['energy'] = '14 TeV'
 	plotPhi['energy'] = '14 TeV'
 	plotPt['energy'] = '14 TeV'
-elif sam == 'pg':
-	plottingZoomed['energy'] = ''
-	plotting['energy'] = ''
-	plotEta['energy'] = ''
-	plotPhi['energy'] = ''
-	plotPt['energy'] = ''
+elif 'pg' in sam:
+	plottingZoomed['energy'] = None
+	plotting['energy'] = None
+	plotEta['energy'] = None
+	plotPhi['energy'] = None
+	plotPt['energy'] = None
+
+plotting1D = { 'Eta': plotEta, 'Phi': plotPhi, 'Pt': plotPt }
+# plotting1D = {'Pt': plotPt }
 
 def Plot2DEffs(files, qualities, plotting, effPath, outputPath):
     chambers = ["MB1", "MB2", "MB3", "MB4"]
@@ -207,7 +206,7 @@ def Plot2DEffs(files, qualities, plotting, effPath, outputPath):
             for ch in chambers:
                 pathToFile = outputPath + 'results_effis_' + fil + '_' + quality + '.root'
                 if not os.path.isfile(pathToFile) :
-                    print (bcolors.red + 'ERROR: ' + pathToFile + ' does not exist, maybe running the ntuple production helps' + bcolors.reset)
+                    print (colored('ERROR: ' + pathToFile + ' does not exist, maybe running the ntuple production helps', 'red'))
                     continue
                 print ('Obtaining 2D efficiency plots for ' + fil + ' with quality type ' + quality + ' and chamber ' + ch)
                 effplot2D.plot2DEff(pathToFile, outputPlotDir + quality + "_" + acctxt.replace(' ', '_'), plotting, "EffPhiEta", ch, "AM", effPath, fil, quality)
@@ -223,7 +222,7 @@ def Plot1DEffs(files, qualities, plotting1D, effPath, outputPath):
 			for quality in qualities:
 				pathToFile = outputPath + 'results_effis_' + fil + '_' + quality + '.root'
 				if not os.path.isfile(pathToFile) :
-					print (bcolors.red + 'ERROR: ' + pathToFile + ' does not exist, maybe running the ntuple production helps' + bcolors.reset)
+					print (colored('ERROR: ' + pathToFile + ' does not exist, maybe running the ntuple production helps', 'red'))
 					continue
 				print ('Obtaining 1D efficiency plots for ' + fil + ' with quality type ' + quality + ' and chamber ' + ch)
 				for var in plotting1D.keys():

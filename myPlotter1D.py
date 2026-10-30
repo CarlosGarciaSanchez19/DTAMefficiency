@@ -1,12 +1,5 @@
 import ROOT
-import array
-import math
 import os
-from copy import deepcopy
-import CMS_lumi
-import sys
-from lookForPU import lookForPU
-from markerColors import markerColors
 ROOT.gROOT.SetBatch(True)
 ROOT.gStyle.SetOptStat(0)
 
@@ -17,7 +10,7 @@ def plot1DEff(pathToFile, outputPlotDir, plotting, plotscaffold, chamber, proces
 
     src = os.path.realpath(pathToFile)
 
-    if plotting['energy'] == '':
+    if plotting['energy'] is None:
         title = chamber + ", " + processing + ", " + plotting['sample'] + ", " + plotting['PU'] + " PU"
     else:
         title = chamber + ", " + plotting['energy'] + ", " + plotting['PU'] + " PU"
