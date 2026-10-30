@@ -3,7 +3,7 @@
 ```bash
 cmsrel CMSSW_16_0_0
 cd CMSSW_16_0_0/src
-cmsen
+cmsenv
 
 git clone git@github.com:battibass/DTNtuples.git DTDPGAnalysis/DTNtuples
 
